@@ -189,7 +189,7 @@ class _DietPageState extends State<DietPage> {
                   child: OpenContainer(
                     closedElevation: 0,
                     transitionType: ContainerTransitionType.fade,
-                    transitionDuration: const Duration(milliseconds: 1000),
+                    transitionDuration: const Duration(milliseconds: 600),
                     closedColor: const Color(0xFFE9E9E9),
                     openBuilder: (context, _) {
                       return WorkoutScreen();
@@ -336,7 +336,7 @@ class MealDetailViewCard extends StatelessWidget {
               fit: FlexFit.tight,
               child: OpenContainer(
                 closedShape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
-                transitionDuration: const Duration(milliseconds: 1000),
+                transitionDuration: const Duration(milliseconds: 600),
                 openBuilder: (context, _) {
                   return MealDetailScreen(
                     meal: meal,
