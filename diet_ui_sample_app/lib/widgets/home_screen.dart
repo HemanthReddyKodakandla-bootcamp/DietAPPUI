@@ -1,7 +1,12 @@
+import 'package:dietuisampleapp/model/meal.dart';
+import 'package:dietuisampleapp/widgets/workout_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:vector_math/vector_math_64.dart' as math;
+import 'package:animations/animations.dart';
+
+import 'meal_details_view.dart';
 
 class DietPage extends StatefulWidget {
   @override
@@ -141,47 +146,69 @@ class _DietPageState extends State<DietPage> {
                     ),
                   ),
                 )),
-            Positioned(
-                top: height * 0.36,
-                left: 0,
-                right: 0,
-                child: Container(
-                  height: height * 0.5,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Text("Meals for Today",
-                          style: const TextStyle(color: Colors.blueGrey, fontSize: 16, fontWeight: FontWeight.w700),
-                      ),
-                      ),
-                      SizedBox(height: 12,),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(32.0)),
+        Positioned(
+          top: height * 0.38,
+          left: 0,
+          right: 0,
+          child: Container(
+            height: height * 0.50,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 8,
+                    left: 32,
+                    right: 16,
+                  ),
+                  child: Text(
+                    "MEALS FOR TODAY",
+                    style: const TextStyle(color: Colors.blueGrey, fontSize: 16, fontWeight: FontWeight.w700),
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(
+                          width: 32,
+                        ),
+                        for (int i = 0; i < meals.length; i++)
+                          MealDetailViewCard(
+                            meal: meals[i],
                           ),
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: <Widget>[
-                                SizedBox(width: 16.0,),
-                                dietCardWidget(image: "assets/fruit_granola.jpg"),
-                                dietCardWidget(image: "assets/pesto_pasta.jpg"),
-                                dietCardWidget(image: "assets/keto_snack.jpg")
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Expanded(
+                  child: OpenContainer(
+                    closedElevation: 0,
+                    transitionType: ContainerTransitionType.fade,
+                    transitionDuration: const Duration(milliseconds: 1000),
+                    closedColor: const Color(0xFFE9E9E9),
+                    openBuilder: (context, _) {
+                      return WorkoutScreen();
+                    },
+                    closedBuilder: (context, VoidCallback openContainer) {
+                      return GestureDetector(
+                        onTap: openContainer,
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 10, left: 32, right: 32),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(30)),
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                const Color(0xFF20008B),
+                                const Color(0xFF200087),
                               ],
                             ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16.0,),
-                      Expanded(
-                        child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 24.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                            color: Colors.blue
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,55 +298,126 @@ class _DietPageState extends State<DietPage> {
                             ],
                           ),
                         ),
-                      )
-                    ],
+                      );
+                    },
                   ),
-                )
+                ),
+              ],
             ),
+          ),
+        ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget dietCardWidget({String image}){
+class MealDetailViewCard extends StatelessWidget {
+  final Meal meal;
+
+  const MealDetailViewCard({Key key, @required this.meal}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-        margin: EdgeInsets.only(right: 16.0,),
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(24.0)),
-          color: Colors.white
-        ),
+      margin: const EdgeInsets.only(
+        right: 20,
+        bottom: 10,
+      ),
+      child: Material(
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+        elevation: 4,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start ,
-          mainAxisSize:MainAxisSize.max,
-            children: <Widget>[
-              Flexible(
-                fit: FlexFit.tight,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(24.0)),
-                    child: Image.asset(
-                      image,
-                      width: 150,
-                      fit: BoxFit.fill,)),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            Flexible(
+              fit: FlexFit.tight,
+              child: OpenContainer(
+                closedShape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+                transitionDuration: const Duration(milliseconds: 1000),
+                openBuilder: (context, _) {
+                  return MealDetailScreen(
+                    meal: meal,
+                  );
+                },
+                closedBuilder: (context, openContainer) {
+                  return GestureDetector(
+                    onTap: openContainer,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      child: Image.asset(
+                        meal.imagePath,
+                        width: 150,
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+                  );
+                },
               ),
-              Flexible(
-                fit: FlexFit.tight,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 12.0,top: 8.0,bottom: 8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text("diet"),
-                      Text("time"),
-                      Text("value"),
-                    ],
-                  ),
+            ),
+            Flexible(
+              fit: FlexFit.tight,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(height: 5),
+                    Text(
+                      meal.mealTime,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Colors.blueGrey,
+                      ),
+                    ),
+                    Text(
+                      meal.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text(
+                      "${meal.kiloCaloriesBurnt} kcal",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Colors.blueGrey,
+                      ),
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.access_time,
+                          size: 15,
+                          color: Colors.black12,
+                        ),
+                        SizedBox(
+                          width: 4,
+                        ),
+                        Text(
+                          "${meal.timeTaken} min",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            color: Colors.blueGrey,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                  ],
                 ),
               ),
-              SizedBox(height: 8.0,)
-            ],
+            ),
+          ],
         ),
+      ),
     );
   }
 }
